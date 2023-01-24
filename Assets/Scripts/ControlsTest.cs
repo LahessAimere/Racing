@@ -15,6 +15,12 @@ public class ControlsTest : MonoBehaviour
 
     private PlayerInput _inputs;
 
+    float _currentAcceleration;
+    float _currentSpeed;
+    
+    public float _maxSpeed;
+    public float _maxRotationSpeed = 1;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -46,6 +52,49 @@ public class ControlsTest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.position = transform.position + (Vector3)_moveDirection*Time.deltaTime;
+        // Récupère les données de mouvement
+        float rotationAngle = _moveDirection.x;
+        float acceleration = _moveDirection.y;
+
+        // Si on accélère pas (laché)
+        if (acceleration == 0)
+        {
+            _currentAcceleration = Mathf.Lerp(_currentAcceleration, 0, Time.deltaTime);
+        }
+        else if (acceleration < 0)
+        {
+            //Si on est en train d'avancer, on freine
+            if (_currentAcceleration > 0)
+            {
+                _currentAcceleration -= Time.deltaTime;
+            }
+            else // On recule
+            {
+                _currentAcceleration += acceleration * Time.deltaTime;
+            }
+        }
+        else
+        {
+            // On accélère progressivement
+            _currentAcceleration += acceleration * Time.deltaTime;
+        }
+
+        _currentAcceleration = Mathf.Clamp(_currentAcceleration, -1, 1);
+
+        if (_currentAcceleration >= 0)
+        {
+            _currentSpeed = Mathf.Lerp(0, _maxSpeed, _currentAcceleration);
+        }
+        else
+        {
+            _currentSpeed = Mathf.Lerp(0, -_maxSpeed, -_currentAcceleration);
+        }
+
+        // Influence accelerations sur la rotation
+        rotationAngle = rotationAngle * _currentAcceleration * _maxRotationSpeed * Time.deltaTime;
+
+        transform.Rotate(0, rotationAngle, 0);
+        transform.position = transform.position +
+                             transform.forward * (_currentSpeed * Time.deltaTime);
     }
 }
