@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEditor.Rendering.LookDev;
 using UnityEngine;
@@ -14,17 +15,18 @@ public class ControlsTest : MonoBehaviour
 
     private Vector2 _moveDirection;
 
+    //inputs
     public InputAction _inputAction;
-
     private PlayerInput _inputs;
 
     float _currentAcceleration;
     float _currentSpeed;
     
+    //speed
     public float _maxSpeed;
     public float _maxRotationSpeed = 1;
 
-
+    //camera
     public CinemachineBrain _brain;
     public CinemachineVirtualCamera _camera1;
     public CinemachineVirtualCamera _camer2;
@@ -44,7 +46,7 @@ public class ControlsTest : MonoBehaviour
         cameraChange.performed += OnChangeCamera;
     }
 
-    private void OnChangeCamera(InputAction.CallbackContext obj) 
+       private void OnChangeCamera(InputAction.CallbackContext obj) 
     {
         var currentCamera = _brain.ActiveVirtualCamera as CinemachineVirtualCamera;
 
@@ -52,13 +54,13 @@ public class ControlsTest : MonoBehaviour
 
         if (currentCamera == _camera1)
         {
-            _camera1.Priority = 10;
-            _camer2.Priority = 0;
+            _camera1.Priority = 0;
+            _camer2.Priority = 10;
         }
         else
         {
-            _camer2.Priority = 10;
-            _camera1.Priority = 0;
+            _camer2.Priority = 0;
+            _camera1.Priority = 10;
         }
     }
 
@@ -82,6 +84,7 @@ public class ControlsTest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         // Récupère les données de mouvement
         float rotationAngle = _moveDirection.x;
         float acceleration = _moveDirection.y;
