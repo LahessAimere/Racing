@@ -1,6 +1,9 @@
+using Cinemachine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using UnityEditor.Rendering;
 using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -21,15 +24,42 @@ public class ControlsTest : MonoBehaviour
     public float _maxSpeed;
     public float _maxRotationSpeed = 1;
 
+
+    public CinemachineBrain _brain;
+    public CinemachineVirtualCamera _camera1;
+    public CinemachineVirtualCamera _camer2;
+
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         _inputs= GetComponent<PlayerInput>();
 
         InputAction move = _inputs.actions["Move"];
+
         move.started += OnMoveStarted;
         move.performed += OnMovePerformed;
         move.canceled += OnMoveCanceled;
+
+        InputAction cameraChange = _inputs.actions["ChangeCamera"];
+        cameraChange.performed += OnChangeCamera;
+    }
+
+    private void OnChangeCamera(InputAction.CallbackContext obj) 
+    {
+        var currentCamera = _brain.ActiveVirtualCamera as CinemachineVirtualCamera;
+
+        Debug.Log("Touch Tab" + currentCamera.Name); 
+
+        if (currentCamera == _camera1)
+        {
+            _camera1.Priority = 10;
+            _camer2.Priority = 0;
+        }
+        else
+        {
+            _camer2.Priority = 10;
+            _camera1.Priority = 0;
+        }
     }
 
     private void OnMoveCanceled(InputAction.CallbackContext context)
