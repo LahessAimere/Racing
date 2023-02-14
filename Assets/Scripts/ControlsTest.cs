@@ -29,7 +29,9 @@ public class ControlsTest : MonoBehaviour
     //camera
     public CinemachineBrain _brain;
     public CinemachineVirtualCamera _camera1;
-    public CinemachineVirtualCamera _camer2;
+    public CinemachineVirtualCamera _camera2;
+    public CinemachineVirtualCamera _camera3;
+    public CinemachineVirtualCamera _camera4;
 
     // Start is called before the first frame update
     private void Start()
@@ -44,27 +46,75 @@ public class ControlsTest : MonoBehaviour
 
         InputAction cameraChange = _inputs.actions["ChangeCamera"];
         cameraChange.performed += OnChangeCamera;
+
+        InputAction cameraRetroLeft = _inputs.actions["RetroLeft"];
+        cameraRetroLeft.performed += RetroLeft;
+
+        InputAction cameraRetroRight = _inputs.actions["RetroRight"];
+        cameraRetroRight.performed += RetroRight;
     }
 
-       private void OnChangeCamera(InputAction.CallbackContext obj) 
+    private void RetroRight(InputAction.CallbackContext obj)
     {
         var currentCamera = _brain.ActiveVirtualCamera as CinemachineVirtualCamera;
 
-        Debug.Log("Touch Tab" + currentCamera.Name); 
+        Debug.Log("Touch e " + currentCamera.Name);
 
-        if (currentCamera == _camera1)
+        if (currentCamera == _camera1 || currentCamera == _camera2 || currentCamera == _camera3)
         {
+            _camera4.Priority = 10;
             _camera1.Priority = 0;
-            _camer2.Priority = 10;
+            _camera2.Priority = 0;
+            _camera3.Priority = 0;
         }
+
         else
         {
-            _camer2.Priority = 0;
+            _camera4.Priority = 0;
             _camera1.Priority = 10;
         }
     }
 
-    private void OnMoveCanceled(InputAction.CallbackContext context)
+    private void RetroLeft(InputAction.CallbackContext obj)
+    {
+        var currentCamera = _brain.ActiveVirtualCamera as CinemachineVirtualCamera;
+
+        Debug.Log("Touch a " + currentCamera.Name);
+
+        if (currentCamera == _camera1 || currentCamera == _camera2 || currentCamera == _camera4)
+        {
+            _camera3.Priority = 10;
+            _camera1.Priority = 0;
+            _camera2.Priority = 0;
+            _camera4.Priority = 0;
+        }
+
+        else
+        {
+            _camera3.Priority = 0;
+            _camera1.Priority = 10;
+        }
+    }
+
+    private void OnChangeCamera(InputAction.CallbackContext obj) 
+    {
+        var currentCamera = _brain.ActiveVirtualCamera as CinemachineVirtualCamera;
+
+        Debug.Log("Touch Tab " + currentCamera.Name); 
+
+        if (currentCamera == _camera1)
+        {
+            _camera1.Priority = 0;
+            _camera2.Priority = 10;
+        }
+
+        else
+        {
+            _camera2.Priority = 0;
+            _camera1.Priority = 10;
+        }
+    }
+        private void OnMoveCanceled(InputAction.CallbackContext context)
     {
        _moveDirection= Vector2.zero;
     }

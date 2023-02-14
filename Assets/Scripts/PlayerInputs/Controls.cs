@@ -44,6 +44,24 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RetroLeft"",
+                    ""type"": ""Button"",
+                    ""id"": ""95219f34-7f89-4b82-ba0c-f2d2b3b1358c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RetroRight"",
+                    ""type"": ""Button"",
+                    ""id"": ""88b96a7b-fe23-4030-93c5-d2d2f6bd4ec5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -123,6 +141,28 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""action"": ""ChangeCamera"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a5665115-c7fd-4906-bc89-362198014c1f"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RetroLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""75c6a251-fd28-46fd-bbd8-dc0fcd42c3c0"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RetroRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -133,6 +173,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_ChangeCamera = m_Player.FindAction("ChangeCamera", throwIfNotFound: true);
+        m_Player_RetroLeft = m_Player.FindAction("RetroLeft", throwIfNotFound: true);
+        m_Player_RetroRight = m_Player.FindAction("RetroRight", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -194,12 +236,16 @@ public partial class @Controls : IInputActionCollection2, IDisposable
     private IPlayerActions m_PlayerActionsCallbackInterface;
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_ChangeCamera;
+    private readonly InputAction m_Player_RetroLeft;
+    private readonly InputAction m_Player_RetroRight;
     public struct PlayerActions
     {
         private @Controls m_Wrapper;
         public PlayerActions(@Controls wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_Player_Move;
         public InputAction @ChangeCamera => m_Wrapper.m_Player_ChangeCamera;
+        public InputAction @RetroLeft => m_Wrapper.m_Player_RetroLeft;
+        public InputAction @RetroRight => m_Wrapper.m_Player_RetroRight;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -215,6 +261,12 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @ChangeCamera.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnChangeCamera;
                 @ChangeCamera.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnChangeCamera;
                 @ChangeCamera.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnChangeCamera;
+                @RetroLeft.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRetroLeft;
+                @RetroLeft.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRetroLeft;
+                @RetroLeft.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRetroLeft;
+                @RetroRight.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRetroRight;
+                @RetroRight.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRetroRight;
+                @RetroRight.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRetroRight;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -225,6 +277,12 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @ChangeCamera.started += instance.OnChangeCamera;
                 @ChangeCamera.performed += instance.OnChangeCamera;
                 @ChangeCamera.canceled += instance.OnChangeCamera;
+                @RetroLeft.started += instance.OnRetroLeft;
+                @RetroLeft.performed += instance.OnRetroLeft;
+                @RetroLeft.canceled += instance.OnRetroLeft;
+                @RetroRight.started += instance.OnRetroRight;
+                @RetroRight.performed += instance.OnRetroRight;
+                @RetroRight.canceled += instance.OnRetroRight;
             }
         }
     }
@@ -233,5 +291,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
     {
         void OnMove(InputAction.CallbackContext context);
         void OnChangeCamera(InputAction.CallbackContext context);
+        void OnRetroLeft(InputAction.CallbackContext context);
+        void OnRetroRight(InputAction.CallbackContext context);
     }
 }
