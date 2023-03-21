@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class carController : MonoBehaviour
 {
-    public Text TxtSpeed;
+
 
     public WheelCollider front_left;
     public WheelCollider front_right;
@@ -18,6 +18,7 @@ public class carController : MonoBehaviour
 
     public float maxTurnAngle = 15f;
     public float currentTurnAngle = 0f;
+    public float Torque = 0;
 
     // Update is called once per frame
     void Update()
@@ -27,6 +28,10 @@ public class carController : MonoBehaviour
         currentTurnAngle = maxTurnAngle * Input.GetAxis("Horizontal");
         front_left.steerAngle = currentTurnAngle;
         front_right.steerAngle = currentTurnAngle;
+        front_left.motorTorque = 0;
+        front_right.motorTorque = 0;
+        back_left.motorTorque = 0;
+        back_right.motorTorque = 0;
 
         //update wheel meshes
         UpdateWheel(front_left, FL);

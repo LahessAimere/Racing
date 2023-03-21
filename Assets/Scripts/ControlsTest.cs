@@ -8,6 +8,9 @@ using UnityEditor.Rendering;
 using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static Unity.Burst.Intrinsics.Arm;
+using UnityEngine.UI;
+using TMPro;
 
 public class ControlsTest : MonoBehaviour
 {
@@ -15,23 +18,43 @@ public class ControlsTest : MonoBehaviour
 
     private Vector2 _moveDirection;
 
+    [Header("Inputs settings")]
     //inputs
-    public InputAction _inputAction;
     private PlayerInput _inputs;
+    private Rigidbody _body;
 
-    float _currentAcceleration;
-    float _currentSpeed;
-    
+    [Header("Speeds settings")]
     //speed
+    public float _accelerationRate = 1;
     public float _maxSpeed;
+    private float _currentSpeed;
+    private float _currentAcceleration;
     public float _maxRotationSpeed = 1;
 
+
+    [Header("Cameras settings")]
     //camera
     public CinemachineBrain _brain;
     public CinemachineVirtualCamera _camera1;
     public CinemachineVirtualCamera _camera2;
     public CinemachineVirtualCamera _camera3;
     public CinemachineVirtualCamera _camera4;
+
+    [Header("Audios settings")]
+    //Audio
+    public AudioSource _audioSource;
+
+    [Header("Texts settings")]
+    public TextMeshProUGUI TxtSpeed;
+
+    [Header("wheels settings")]
+    public float _wheelRotationFactor = 5;
+    public Transform _wheelFrontRight;
+    public Transform _wheelFrontLeft;
+    public Transform _wheelRearRight;
+    public Transform _wheelRearLeft;
+    private float _rotationAngle;
+    private Vector3 _wheelRotation;
 
     // Start is called before the first frame update
     private void Start()
@@ -52,6 +75,9 @@ public class ControlsTest : MonoBehaviour
 
         InputAction cameraRetroRight = _inputs.actions["RetroRight"];
         cameraRetroRight.performed += RetroRight;
+
+        _audioSource = GetComponent<AudioSource>();
+        _body = GetComponentInChildren<Rigidbody>();
     }
 
     private void RetroRight(InputAction.CallbackContext obj)
@@ -131,10 +157,15 @@ public class ControlsTest : MonoBehaviour
         _moveDirection = context.ReadValue<Vector2>();
     }
 
+    void FixedUpdate()
+    {
+        _body.AddForce(transform.forward * _currentSpeed);
+    }
+
+
     // Update is called once per frame
     void Update()
     {
-
         // Récupère les données de mouvement
         float rotationAngle = _moveDirection.x;
         float acceleration = _moveDirection.y;
@@ -167,17 +198,44 @@ public class ControlsTest : MonoBehaviour
         if (_currentAcceleration >= 0)
         {
             _currentSpeed = Mathf.Lerp(0, _maxSpeed, _currentAcceleration);
+
         }
         else
         {
             _currentSpeed = Mathf.Lerp(0, -_maxSpeed, -_currentAcceleration);
         }
 
-        // Influence accelerations sur la rotation
-        rotationAngle = rotationAngle * _currentAcceleration * _maxRotationSpeed * Time.deltaTime;
+        RotateWheels(rotationAngle);
 
-        transform.Rotate(0, rotationAngle, 0);
-        transform.position = transform.position +
-                             transform.forward * (_currentSpeed * Time.deltaTime);
+        // Influence accelerations sur la rotation
+        _rotationAngle = rotationAngle * _currentAcceleration * _maxRotationSpeed;
+
+        // Rotation du player.
+        // /!\ N'utilise pas la physique pour la rotation, mais simplification ok pour nos besoins
+        transform.Rotate(0, _rotationAngle * Time.deltaTime, 0);
+        TxtSpeed.text = "Speed : " + (int)acceleration;
+    }
+
+    private void RotateWheels(float rotationAngle)
+    {
+        _wheelRotation.x += _currentSpeed * Time.deltaTime * _wheelRotationFactor;
+
+        if (rotationAngle != 0)
+        {
+            _wheelRotation.y = Mathf.Clamp(_wheelRotation.y + rotationAngle * Mathf.Sign(_currentSpeed), -30, 30);
+        }
+        else
+        {
+            _wheelRotation.y = Mathf.Lerp(_wheelRotation.y, 0, Time.deltaTime);
+        }
+
+        _wheelFrontRight.localEulerAngles = _wheelRotation;
+        _wheelFrontLeft.localEulerAngles = _wheelRotation;
+
+        Vector3 rearRotation = _wheelRotation;
+        rearRotation.y = 0;
+
+        _wheelRearRight.localEulerAngles = rearRotation;
+        _wheelRearLeft.localEulerAngles = rearRotation;
     }
 }
